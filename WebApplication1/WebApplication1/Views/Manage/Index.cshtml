@@ -10,31 +10,36 @@
 
     @Html.ActionLink("Tạo sản phẩm mới", "Create")
 </p>
-<table class="table table-bordered table-condensed table-hover table-responsive table-striped" id="myTable" >
+<table class="table table-bordered table-condensed table-hover table-responsive table-striped" id="DanhSachSanPham">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.MaSP)
+                Mã sản phẩm
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TenSP)
+                Tên sản phẩm
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.GiaBan)
+                Loại sản phẩm
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.GiaGoc)
+                Giá bán
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.GiaGop)
+                Giá gốc
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SoLuongTon)
+                Giá trả góp
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LoaiSanPham.TenLoai)
+                Số lượng tồn kho
             </th>
-            <th></th>
+            <th>
+                Hình ảnh
+            </th>
+            <th>
+                Tùy chọn
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -42,43 +47,58 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.MaSP)
+                    @item.MaSP
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.TenSP)
+                    @item.TenSP
+                </td>
+
+                <td>
+                    @item.LoaiSanPham.TenLoai
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.GiaBan)
+                    @item.GiaBan.ToString("#,##")
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.GiaGoc)
+                    @item.GiaGoc.ToString("#,##")
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.GiaGop)
+                    @item.GiaGop.ToString("#,##")
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.SoLuongTon)
+                    @item.SoLuongTon.ToString("#,##")
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.LoaiSanPham.TenLoai)
+                    <img src="@Url.Action("Details", new {id = item.id })" width = "50"  Height = "70">
                 </td>
                 <td>
-                    @Html.ActionLink("Sửa", "Edit", new { id = item.id }) |
-                    @Html.ActionLink("Chi tiết", "Details", new { id = item.id }) |
-                    @Html.ActionLink("Xóa", "Delete", new { id = item.id })
+                    <a href="@Url.Action("Edit", new { id = item.id })">
+                        <sp>
+                            <span class="btn btn-success glyphicon glyphicon-pencil"></span>
+                    </a>
+                    <a href="@Url.Action("Details", new {id = item.id })">
+                        <span class="btn btn-primary glyphicon glyphicon-info-sign"></span>
+                    </a>
+                    <a href="@Url.Action("Delete", new {id = item.id })">
+                        <span class="btn btn-danger glyphicon glyphicon-trash"></span>
+                    </a>
+                    @*@Html.ActionLink("Sửa", "Edit", new { id = item.id }) |
+                        @Html.ActionLink("Chi tiết", "Details", new { id = item.id }) |
+                        @Html.ActionLink("Xóa", "Delete", new { id = item.id })*@
                 </td>
             </tr>
         }
     </tbody>
-
 </table>
 @section Scripts{
-    <link href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet"/>
-
+    <link href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+            
     <script>
+
         $(document).ready(function () {
-            $('#myTable').DataTable();
+            $('#DanhSachSanPham').DataTable();
+            
         });
     </script>
-      }
+}

@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using WebApplication1.Models;
+using System.Transactions;
 
 namespace WebApplication1.Controllers
 {
@@ -22,18 +23,11 @@ namespace WebApplication1.Controllers
         }
 
         // GET: /Manage/Details/5
-        public ActionResult Details(int? id)
+        public FileResult Details(string id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            BangSanPham bangsanpham = db.BangSanPhams.Find(id);
-            if (bangsanpham == null)
-            {
-                return HttpNotFound();
-            }
-            return View(bangsanpham);
+            var path = Server.MapPath("~/App_Data");
+            path = System.IO.Path.Combine(path, id);
+            return File(path,"images");
         }
 
         // GET: /Manage/Create
@@ -48,17 +42,55 @@ namespace WebApplication1.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include="id,MaSP,TenSP,Loai_id,GiaBan,GiaGoc,GiaGop,SoLuongTon")] BangSanPham bangsanpham)
+        public ActionResult Create( BangSanPham model)
         {
+            CheckBangSanPham (model);
             if (ModelState.IsValid)
             {
-                db.BangSanPhams.Add(bangsanpham);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
+                using (var scope = new TransactionScope())
+                {
+                    db.BangSanPhams.Add(model);
+                    db.SaveChanges();
 
-            ViewBag.Loai_id = new SelectList(db.LoaiSanPhams, "id", "TenLoai", bangsanpham.Loai_id);
-            return View(bangsanpham);
+                    if (Request.Files["HinhAnh"] != null &&
+                       Request.Files["HinhAnh"].ContentLength > 0)
+                    {
+                        var path = Server.MapPath("~/App_Data");
+                        path = System.IO.Path.Combine(path, model.id.ToString());
+                        Request.Files["HinhAnh"].SaveAs(path);
+
+                        scope.Complete();
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("HinhAnh", "Chua chon hinh anh cho san pham");
+                    }
+                }
+                    
+            }
+            
+
+            ViewBag.Loai_id = new SelectList(db.LoaiSanPhams, "id", "TenLoai", model.Loai_id);
+            return View(model);
+        }
+        private void CheckBangSanPham(BangSanPham model)
+        {
+            if (model.GiaGoc < 0) {
+                ModelState.AddModelError("Giagoc", "Gia goc phai lon hon 0");
+            }
+            if (model.GiaGoc > model.GiaBan)
+            {
+                ModelState.AddModelError("Giagoc", "Gia goc phai lon hon 0");
+            }
+            if (model.GiaGoc > model.GiaGop)
+            {
+                ModelState.AddModelError("Giagoc", "Gia goc phai lon hon 0");
+            }
+            if (model.SoLuongTon < 0)
+            {
+                ModelState.AddModelError("SoLuongTon", "So luong ton khi phai lon hon 0");
+            }
         }
 
         // GET: /Manage/Edit/5
